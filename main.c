@@ -1,3 +1,10 @@
+// Tugas Besar EL2208 Praktikum Pemecahan Masalah dengan C
+// Kelompok : A2
+// Problem : Maze Problem
+// Deskripsi program :
+// 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -14,7 +21,7 @@ bool isValid(int x, int y) {
     return x >= 0 && x < nRows && y >= 0 && y < nCols && maze[x][y] != '#' && !visited[x][y];
 }
 
-// Fungsi untuk mencetak path dalam format koordinat
+// Fungsi untuk mencetak path
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     printf("Path: ");
     for (int i = 0; i < pathLength; i++) {
@@ -36,7 +43,7 @@ void printPath(int path[][2], int pathLength, int **shortestPath, int **longestP
     }
 }
 
-// DFS function to explore all possible paths
+// DFS untuk mencari semua jalur yang mungkin
 void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     visited[x][y] = true;
     path[pathIndex][0] = x;
@@ -46,7 +53,7 @@ void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **s
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     } else {
-        // Explore the neighbors in the order of Down, Up, Right, Left
+        // Explore atas, bawah, kiri =, kanan
         if (isValid(x + 1, y)) DFS(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x - 1, y)) DFS(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x, y + 1)) DFS(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
@@ -57,7 +64,7 @@ void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **s
     pathIndex--;
 }
 
-// Read maze from a file
+// Baca input file
 void readMaze(const char* filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -67,8 +74,8 @@ void readMaze(const char* filename) {
 
     nRows = 0;
     while (fgets(maze[nRows], MAX_SIZE, file)) {
-        nCols = strlen(maze[nRows]) - 1;  // Ignore newline character
-        maze[nRows][nCols] = '\0';  // Remove newline character
+        nCols = strlen(maze[nRows]) - 1; 
+        maze[nRows][nCols] = '\0';  
         nRows++;
     }
 
@@ -83,7 +90,7 @@ int main() {
 
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
-    // Find start (S) and end (E) positions
+    // Mencari titik S dan E
     for (int i = 0; i < nRows; i++) {
         for (int j = 0; j < nCols; j++) {
             if (maze[i][j] == 'S') {
@@ -101,7 +108,7 @@ int main() {
         return 1;
     }
 
-    int path[MAX_SIZE * MAX_SIZE][2];  // Store path as coordinate pairs
+    int path[MAX_SIZE * MAX_SIZE][2]; 
     int *shortestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;

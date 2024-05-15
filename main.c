@@ -1,3 +1,8 @@
+// Tugas Besar EL2208 Praktikum Pemecahan Masalah dengan C
+// Kelompok : A2
+// Problem : Maze Problem
+// Deskripsi program : Program ini akan menemukan semua kemungkinan jalur dari Start ke End, serta menemukan jalur terpendek dan jalur terpanjang dari file input labirin yang berukuran minimal 7x7
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>

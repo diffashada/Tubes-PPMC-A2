@@ -1,104 +1,114 @@
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
-#define MAX_ROW 10
-#define MAX_COL 10
+#define MAX_SIZE 100
 
-char maze[MAX_ROW][MAX_COL];
-int visited[MAX_ROW][MAX_COL];
-int path_count = 0;
-int shortest_path_len = MAX_ROW * MAX_COL;
-int longest_path_len = 0;
-char shortest_path[MAX_ROW * MAX_COL];
-char longest_path[MAX_ROW * MAX_COL];
+char maze[MAX_SIZE][MAX_SIZE];
+bool visited[MAX_SIZE][MAX_SIZE];
+int nRows, nCols;
+int shortestLength = 0, longestLength = 0;
+int shortestPath[MAX_SIZE * MAX_SIZE][2], longestPath[MAX_SIZE * MAX_SIZE][2];
 
-void findPaths(int x, int y, int dest_x, int dest_y, int len, char path[MAX_ROW * MAX_COL], int path_len) {
-    if (x < 0 || x >= MAX_ROW || y < 0 || y >= MAX_COL || maze[x][y] == '#' || visited[x][y])
-        return;
+// Menentukan apakah sel adalah valid untuk dilewati
+bool isValid(int x, int y) {
+    return x >= 0 && x < nRows && y >= 0 && y < nCols && maze[x][y] != '#' && !visited[x][y];
+}
 
-    if (x == dest_x && y == dest_y) {
-        path[path_len] = '\0';
-        printf("Path %d: %s\n", ++path_count, path);
-        if (len > longest_path_len) {
-            longest_path_len = len;
-            strcpy(longest_path, path);
+// Backtracking untuk mencari semua jalur yang mungkin
+void backtracking(int x, int y, int endX, int endY, int path[][2], int pathIndex) {
+    visited[x][y] = true;
+    path[pathIndex][0] = x;
+    path[pathIndex][1] = y;
+    pathIndex++;
+
+    if (x == endX && y == endY) {
+        // Update shortest path
+        if (shortestLength == 0 || pathIndex < shortestLength) {
+            shortestLength = pathIndex;
+            memcpy(shortestPath, path, pathIndex * 2 * sizeof(int));
         }
-        if (len < shortest_path_len) {
-            shortest_path_len = len;
-            strcpy(shortest_path, path);
+        // Update longest path
+        if (pathIndex > longestLength) {
+            longestLength = pathIndex;
+            memcpy(longestPath, path, pathIndex * 2 * sizeof(int));
         }
-        return;
+    } else {
+        // Explore atas, bawah, kiri, kanan
+        if (isValid(x + 1, y)) backtracking(x + 1, y, endX, endY, path, pathIndex);
+        if (isValid(x - 1, y)) backtracking(x - 1, y, endX, endY, path, pathIndex);
+        if (isValid(x, y + 1)) backtracking(x, y + 1, endX, endY, path, pathIndex);
+        if (isValid(x, y - 1)) backtracking(x, y - 1, endX, endY, path, pathIndex);
     }
 
-    visited[x][y] = 1;
+    visited[x][y] = false;
+}
 
-    path[path_len] = '(';
-    path[path_len + 1] = x + '0';
-    path[path_len + 2] = ',';
-    path[path_len + 3] = y + '0';
-    path[path_len + 4] = ')';
-    path[path_len + 5] = '-';
-    path[path_len + 6] = '>';
+// Baca input file
+void readMaze(const char* filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Unable to open file");
+        exit(EXIT_FAILURE);
+    }
 
-    findPaths(x + 1, y, dest_x, dest_y, len + 1, path, path_len + 7);
-    findPaths(x - 1, y, dest_x, dest_y, len + 1, path, path_len + 7);
-    findPaths(x, y + 1, dest_x, dest_y, len + 1, path, path_len + 7);
-    findPaths(x, y - 1, dest_x, dest_y, len + 1, path, path_len + 7);
+    nRows = 0;
+    while (fgets(maze[nRows], MAX_SIZE, file)) {
+        nCols = strlen(maze[nRows]) - 1; 
+        maze[nRows][nCols] = '\0';  
+        nRows++;
+    }
 
-    visited[x][y] = 0;
+    fclose(file);
 }
 
 int main() {
-    FILE *fp;
     char filename[100];
-
-    printf("Masukkan File Txt Struktur Maze: ");
+    printf("Enter the maze file name: ");
     scanf("%s", filename);
+    readMaze(filename);
 
-    fp = fopen(filename, "r");
+    int startX = -1, startY = -1, endX = -1, endY = -1;
 
-    if (fp == NULL) {
-        printf("File tidak dapat dibuka.");
+    // Mencari titik S dan E
+    for (int i = 0; i < nRows; i++) {
+        for (int j = 0; j < nCols; j++) {
+            if (maze[i][j] == 'S') {
+                startX = i;
+                startY = j;
+            } else if (maze[i][j] == 'E') {
+                endX = i;
+                endY = j;
+            }
+        }
+    }
+
+    if (startX == -1 || startY == -1 || endX == -1 || endY == -1) {
+        printf("Start or end not found in the maze.\n");
         return 1;
     }
 
-    printf("All possible paths from start to end:\n");
+    int path[MAX_SIZE * MAX_SIZE][2]; 
 
-    int start_x, start_y, end_x, end_y;
+    backtracking(startX, startY, endX, endY, path, 0);
 
-    for (int i = 0; i < MAX_ROW; i++) {
-        char line[MAX_COL + 2];  // +2 for '\n' and '\0'
-        if (fgets(line, MAX_COL + 2, fp) == NULL) {
-            printf("Error reading maze from file.");
-            return 1;
-        }
-        for (int j = 0; j < MAX_COL; j++) {
-            maze[i][j] = line[j];
-            visited[i][j] = 0;
-            if (maze[i][j] == 'S') {
-                start_x = i;
-                start_y = j;
-            }
-            if (maze[i][j] == 'E') {
-                end_x = i;
-                end_y = j;
-            }
-        }
+    printf("Shortest Path: ");
+    for (int i = 0; i < shortestLength; i++) {
+        printf("(%d,%d)", shortestPath[i][0] + 1, shortestPath[i][1] + 1);
+        if (i < shortestLength - 1) printf(" -> ");
     }
+    printf("\n");
 
-    char path[MAX_ROW * MAX_COL];
-    findPaths(start_x, start_y, end_x, end_y, 0, path, 0);
-
-    printf("\nTotal number of paths: %d\n", path_count);
-
-    printf("\nLongest path from start to end:\n");
-    printf("Path: %s\n", longest_path);
-
-    printf("\nShortest path from start to end:\n");
-    printf("Path: %s\n", shortest_path);
-
-    fclose(fp);
+    printf("Longest Path: ");
+    for (int i = 0; i < longestLength; i++) {
+        printf("(%d,%d)", longestPath[i][0] + 1, longestPath[i][1] + 1);
+        if (i < longestLength - 1) printf(" -> ");
+    }
+    printf("\n");
 
     return 0;
 }

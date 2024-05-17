@@ -61,6 +61,9 @@ void greedy(int x, int y, int endX, int endY, int path[][2], int pathIndex, int 
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     }
+
+    // X IS Y AND Y IS X AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     else if(abs(distanceX) <= abs(distanceY)){
         if (distanceX > 0){
             if(validityRight == 1) greedy(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);

@@ -9,6 +9,7 @@
 char maze[MAX_SIZE][MAX_SIZE];
 bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
+int totalPaths = 0;  // Variabel untuk menyimpan jumlah total jalur yang valid
 
 // Menentukan apakah sel adalah valid untuk dilewati
 bool isValid(int x, int y) {
@@ -33,6 +34,8 @@ void printPath(int path[][2], int pathLength, int **shortestPath, int **longestP
         *longestLength = pathLength;
         memcpy(*longestPath, path, pathLength * 2 * sizeof(int));
     }
+
+    totalPaths++;  // Increment total paths for each valid path found
 }
 
 // DFS untuk mencari semua jalur yang mungkin
@@ -112,6 +115,7 @@ int main() {
 
     printf("Time spent: %f seconds\n", time_spent);
 
+    printf("Total paths found: %d\n", totalPaths);
     printf("Shortest Path: ");
     for (int i = 0; i < shortestLength; i++) {
         printf("(%d,%d)", shortestPath[i*2] + 1, shortestPath[i*2 + 1] + 1);

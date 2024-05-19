@@ -21,5 +21,8 @@ void readMaze(const char *filename);
 void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength);
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength);
 bool isValid(int x, int y);
+void greedyAlg(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength);
+void solveMazeBacktracking(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength);
+
 
 #endif // SOLVE_MAZE_H

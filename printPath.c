@@ -7,6 +7,7 @@ void printPath(int path[][2], int pathLength, int **shortestPath, int **longestP
         if (i < pathLength - 1) printf(" -> ");
     }
     printf("\n");
+    
 
     // Update shortest path
     if (*shortestLength == 0 || pathLength < *shortestLength) {

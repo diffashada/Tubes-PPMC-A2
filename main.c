@@ -5,8 +5,6 @@
 
 #include "solveMaze.h"
 #include "DFS.c"
-#include "greedy.c"
-#include "djikstra.c"
 #include "backTracking.c"
 
 int main() {
@@ -15,6 +13,10 @@ int main() {
     printf("Enter the maze file name: ");
     scanf("%s", filename);
     readMaze(filename);
+
+    printf("What algorithm methods do you want to use? (dfs/backtracking)\n");
+    printf("Algorithm : ");
+    scanf("%s", algo);
 
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
@@ -41,30 +43,20 @@ int main() {
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;
 
-    printf("What algorithm methods do you want to use?\n");
-    scanf("%s", algo);
 
-    if (algo == "dfs"){
-        clock_t start_time = clock();
+    double time_spent;
+    clock_t start_time = clock();
+    
+    if (strcmp(algo, "dfs") == 0){
         DFS(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
-        clock_t end_time = clock();
-        double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
     }
 
-    else if (algo == "backtracking"){
-
+    else if (strcmp(algo, "backtracking") == 0){
+        solveMazeBacktracking(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
     }
-
-    else if (algo == "djikstra"){
-
-    }
-
-    else if (algo == "greedy"){
-
-    }
-    else if (algo == "astar"){
-
-    }
+    
+    clock_t end_time = clock();
+    time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
     printf("Time spent: %f seconds\n", time_spent);
 

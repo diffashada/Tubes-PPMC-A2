@@ -11,6 +11,7 @@ void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **s
     pathIndex++;
 
     if (x == endX && y == endY) {
+        totalPaths++;
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     } else {
         // Explore all four directions

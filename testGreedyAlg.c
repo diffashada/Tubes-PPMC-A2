@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_SIZE 100
 
@@ -9,102 +10,6 @@ char maze[MAX_SIZE][MAX_SIZE];
 bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
 
-// Menentukan apakah sel adalah valid untuk dilewati
-bool isValid(int x, int y) {
-    return x >= 0 && x < nRows && y >= 0 && y < nCols && maze[x][y] != '#' && !visited[x][y];
-}
-
-// Fungsi untuk mencetak path
-void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    printf("Path: ");
-    for (int i = 0; i < pathLength; i++) {
-        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);
-        if (i < pathLength - 1) printf(" -> ");
-    }
-    printf("\n");
-
-    // Update shortest path
-    if (*shortestLength == 0 || pathLength < *shortestLength) {
-        *shortestLength = pathLength;
-        memcpy(*shortestPath, path, pathLength * 2 * sizeof(int));
-    }
-
-    // Update longest path
-    if (pathLength > *longestLength) {
-        *longestLength = pathLength;
-        memcpy(*longestPath, path, pathLength * 2 * sizeof(int));
-    }
-}
-
-void greedy(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    visited[x][y] = true;
-    path[pathIndex][0] = x;
-    path[pathIndex][1] = y;
-    pathIndex++;
-    printf("x = %d\n", x);
-    printf("y = %d\n", y);
-    printf("Validity of right is %d\n", isValid(x+1,y));
-    printf("Validity of left is %d\n", isValid(x-1 , y));
-    printf("Validity of up is %d\n", isValid(x , y+1));
-    printf("Validity of down is %d\n", isValid(x , y-1));
-
-    int distanceX, distanceY, validityLeft, validityRight, validityUp, validityDown = 0;
-    distanceX = endX - x;
-    distanceY = endY - y;
-    validityLeft = isValid(x-1, y);
-    validityRight = isValid(x+1, y);
-    validityDown = isValid(x, y-1);
-    validityUp = isValid(x, y+1);
-    printf("Distance to goal in X is %d\n", distanceX);
-    printf("Distance to goal in Y is %d\n", distanceY);
-
-    if (x == endX && y == endY) {
-        printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    }
-
-    // X IS Y AND Y IS X AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
-    else if(abs(distanceX) <= abs(distanceY)){
-        if (distanceX > 0){
-            if(validityRight == 1) greedy(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-            else{
-                goto jic;
-            }
-        }
-        else {
-            if(validityLeft == 1) greedy(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-            else{
-                goto jic;
-            }
-        }
-    }
-    else if (abs(distanceX) > abs(distanceY)){
-        if (distanceY > 0){
-            if(validityDown == 1) greedy(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-            else{
-                goto jic;
-            }
-        }
-        else {
-            if(validityUp == 1) greedy(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-            else{
-                goto jic;
-            }
-        }
-    }
-    else{
-        jic:
-        if (isValid(x + 1, y)) greedy(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        if (isValid(x - 1, y)) greedy(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        if (isValid(x, y + 1)) greedy(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        if (isValid(x, y - 1)) greedy(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    }
-
-    visited[x][y] = false;
-    pathIndex--;
-}
-
-// Baca input file
 void readMaze(const char* filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -122,6 +27,135 @@ void readMaze(const char* filename) {
     fclose(file);
 }
 
+void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
+    printf("Path: ");
+    for (int i = 0; i < pathLength; i++) {
+        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);  // Memperbaiki urutan x dan y
+        if (i < pathLength - 1) printf(" -> ");
+    }
+    printf("\n");
+
+    // Update shortest path
+    if (*shortestLength == 0 || pathLength < *shortestLength) {
+        *shortestLength = pathLength;
+        memcpy(*shortestPath, path, pathLength * 2 * sizeof(int));
+    }
+
+    // Update longest path
+    if (pathLength > *longestLength) {
+        *longestLength = pathLength;
+        memcpy(*longestPath, path, pathLength * 2 * sizeof(int));
+    }
+}
+
+bool isValid(int x, int y) {
+    return y >= 0 && y < nRows && x >= 0 && x < nCols && maze[y][x] != '#' && !visited[y][x];
+}
+
+void greedyAlg(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
+    visited[y][x] = true;
+    path[pathIndex][0] = x;
+    path[pathIndex][1] = y;
+    pathIndex++;
+
+    int distanceX, distanceY = 0;
+    distanceX = abs(endX - x);
+    distanceY = abs(endY - y);
+
+    if (x == endX && y == endY) {
+        printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+    } else {
+        //Prio one with least distance
+        if (distanceX > 0){
+            if (isValid(x + 1,y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+            else {
+                if (distanceY > 0){    
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else if (distanceY < 0){
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+
+                }
+            }
+        }
+        else if (distanceX < 0){
+            if (isValid(x - 1,y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+            else {
+                if (distanceY > 0){    
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else if (distanceY < 0){
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x + 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+
+                }
+            }
+        }
+        else if (distanceY > 0){
+            if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+            else {
+                if (distanceX > 0){    
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else if (distanceX < 0){
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+
+                }
+            }
+        }
+        else if (distanceY < 0){
+            if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+            else {
+                if (distanceX > 0){    
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else if (distanceX < 0){
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+
+                }
+            }
+        }
+    }
+
+    visited[y][x] = false;
+    pathIndex--;
+}
+
 int main() {
     char filename[100];
     printf("Enter the maze file name: ");
@@ -130,15 +164,15 @@ int main() {
 
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
-    // Mencari titik S dan E
-    for (int i = 0; i < nRows; i++) {
-        for (int j = 0; j < nCols; j++) {
-            if (maze[i][j] == 'S') {
-                startX = i;
-                startY = j;
-            } else if (maze[i][j] == 'E') {
-                endX = i;
-                endY = j;
+    // Find start and end points
+    for (int y = 0; y < nRows; y++) {
+        for (int x = 0; x < nCols; x++) {
+            if (maze[y][x] == 'S') {
+                startX = x;
+                startY = y;
+            } else if (maze[y][x] == 'E') {
+                endX = x;
+                endY = y;
             }
         }
     }
@@ -148,12 +182,17 @@ int main() {
         return 1;
     }
 
-    int path[MAX_SIZE * MAX_SIZE][2]; 
+    int path[MAX_SIZE * MAX_SIZE][2];
     int *shortestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;
 
-    greedy(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
+    clock_t start_time = clock();
+    greedyAlg(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
+    clock_t end_time = clock();
+    double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+    printf("Time spent: %f seconds\n", time_spent);
 
     printf("Shortest Path: ");
     for (int i = 0; i < shortestLength; i++) {

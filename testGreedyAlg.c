@@ -64,41 +64,53 @@ void greedyAlg(int x, int y, int endX, int endY, int path[][2], int pathIndex, i
 
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        goto end;
     }
-
-    if ((abs(distanceX) > abs(distanceY)) && (distanceY > 0)){
-        if (isValid(x, y + 1)) greedyAlg(x, y+1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        goto xAxis;
+    else{
+        if (abs(distanceX) > abs(distanceY)){
+            if (distanceY == 0){
+                if (distanceX > 0){
+                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);    
+                }
+                else{
+                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+            
+            }
+            else{
+                if (distanceY > 0){
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+            }
+        }
+        if (abs(distanceX) < abs(distanceY)){
+            if (distanceX == 0){
+                if (distanceY > 0){
+                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+                else{
+                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+                }
+            }
+            else if (distanceX > 0){
+                if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);                
+            }
+            else{
+                if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+            }
+        }
     }
-    else if ((abs(distanceX) > abs(distanceY)) && (distanceY < 0)){
-        if (isValid(x, y - 1)) greedyAlg(x, y-1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        goto xAxis;
-    }
-    else if ((abs(distanceX) < abs(distanceY)) && (distanceX > 0)){
-        if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        goto yAxis;
-    }
-    else if ((abs(distanceX) < abs(distanceY)) && (distanceX < 0)){
-        if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        goto yAxis;
-    }
-    else if (distanceX > 0){
-        if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        if (isValid(x, y+1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    }
-    else if (distanceX < 0){
-        if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-        if (isValid(x, y - 1)) greedyAlg(x, y-1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    }
-
-    xAxis:
-    if (isValid(x + 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    if (isValid(x-1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    goto end;
-    yAxis:
-    if (isValid(x, y+1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    if (isValid(x, y-1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+    
+    xMove:
+    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+    xMoveNeg:
+    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+    yMove:
+    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+    yMoveNeg:
+    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
 
     end:
     visited[y][x] = false;

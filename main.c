@@ -14,6 +14,7 @@
 char maze[MAX_SIZE][MAX_SIZE];
 bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
+int totalPaths = 0;  // Variabel untuk menyimpan jumlah total jalur yang valid
 
 int main() {
     char filename[100];

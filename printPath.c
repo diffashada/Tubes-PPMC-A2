@@ -7,6 +7,7 @@
 char maze[MAX_SIZE][MAX_SIZE];
 bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
+int totalPaths = 0;  // Variabel untuk menyimpan jumlah total jalur yang valid
 
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     printf("Path: ");

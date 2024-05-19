@@ -1,10 +1,3 @@
-// Tugas Besar EL2208 Praktikum Pemecahan Masalah dengan C
-// Kelompok : A2
-// Problem : Maze Problem
-// Deskripsi program : Program ini akan menemukan semua kemungkinan jalur dari Start ke End, serta menemukan jalur terpendek dan jalur terpanjang dari file input labirin yang berukuran minimal 7x7
-// Metode : Depth First Search (DFS)
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -18,14 +11,14 @@ int nRows, nCols;
 
 // Menentukan apakah sel adalah valid untuk dilewati
 bool isValid(int x, int y) {
-    return x >= 0 && x < nRows && y >= 0 && y < nCols && maze[x][y] != '#' && !visited[x][y];
+    return y >= 0 && y < nRows && x >= 0 && x < nCols && maze[y][x] != '#' && !visited[y][x];
 }
 
 // Fungsi untuk mencetak path
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     printf("Path: ");
     for (int i = 0; i < pathLength; i++) {
-        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);
+        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);  // Memperbaiki urutan x dan y
         if (i < pathLength - 1) printf(" -> ");
     }
     printf("\n");
@@ -43,9 +36,10 @@ void printPath(int path[][2], int pathLength, int **shortestPath, int **longestP
     }
 }
 
+
 // DFS untuk mencari semua jalur yang mungkin
 void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    visited[x][y] = true;
+    visited[y][x] = true;
     path[pathIndex][0] = x;
     path[pathIndex][1] = y;
     pathIndex++;
@@ -53,14 +47,14 @@ void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **s
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     } else {
-        // Explore atas, bawah, kiri =, kanan
+        // Explore kanan, kiri, bawah, atas
         if (isValid(x + 1, y)) DFS(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x - 1, y)) DFS(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x, y + 1)) DFS(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x, y - 1)) DFS(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     }
 
-    visited[x][y] = false;
+    visited[y][x] = false;
     pathIndex--;
 }
 
@@ -74,8 +68,8 @@ void readMaze(const char* filename) {
 
     nRows = 0;
     while (fgets(maze[nRows], MAX_SIZE, file)) {
-        nCols = strlen(maze[nRows]) - 1; 
-        maze[nRows][nCols] = '\0';  
+        nCols = strlen(maze[nRows]) - 1;
+        maze[nRows][nCols] = '\0';
         nRows++;
     }
 
@@ -91,14 +85,14 @@ int main() {
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
     // Mencari titik S dan E
-    for (int i = 0; i < nRows; i++) {
-        for (int j = 0; j < nCols; j++) {
-            if (maze[i][j] == 'S') {
-                startX = i;
-                startY = j;
-            } else if (maze[i][j] == 'E') {
-                endX = i;
-                endY = j;
+    for (int y = 0; y < nRows; y++) {
+        for (int x = 0; x < nCols; x++) {
+            if (maze[y][x] == 'S') {
+                startX = x;
+                startY = y;
+            } else if (maze[y][x] == 'E') {
+                endX = x;
+                endY = y;
             }
         }
     }
@@ -108,7 +102,7 @@ int main() {
         return 1;
     }
 
-    int path[MAX_SIZE * MAX_SIZE][2]; 
+    int path[MAX_SIZE * MAX_SIZE][2];
     int *shortestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;

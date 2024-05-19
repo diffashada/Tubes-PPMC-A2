@@ -11,7 +11,7 @@ int nRows, nCols;
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     printf("Path: ");
     for (int i = 0; i < pathLength; i++) {
-        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);
+        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);  // Memperbaiki urutan x dan y
         if (i < pathLength - 1) printf(" -> ");
     }
     printf("\n");

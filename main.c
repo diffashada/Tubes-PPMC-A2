@@ -23,14 +23,14 @@ int main() {
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
     // Mencari titik S dan E
-    for (int i = 0; i < nRows; i++) {
-        for (int j = 0; j < nCols; j++) {
-            if (maze[i][j] == 'S') {
-                startX = i;
-                startY = j;
-            } else if (maze[i][j] == 'E') {
-                endX = i;
-                endY = j;
+    for (int y = 0; y < nRows; y++) {
+        for (int x = 0; x < nCols; x++) {
+            if (maze[y][x] == 'S') {
+                startX = x;
+                startY = y;
+            } else if (maze[y][x] == 'E') {
+                endX = x;
+                endY = y;
             }
         }
     }
@@ -40,7 +40,7 @@ int main() {
         return 1;
     }
 
-    int path[MAX_SIZE * MAX_SIZE][2]; 
+    int path[MAX_SIZE * MAX_SIZE][2];
     int *shortestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;

@@ -10,5 +10,5 @@ bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
 
 bool isValid(int x, int y) {
-    return x >= 0 && x < nRows && y >= 0 && y < nCols && maze[x][y] != '#' && !visited[x][y];
+    return y >= 0 && y < nRows && x >= 0 && x < nCols && maze[y][x] != '#' && !visited[y][x];
 }

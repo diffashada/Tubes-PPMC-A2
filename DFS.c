@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_SIZE 100
 
@@ -18,24 +19,21 @@ bool isValid(int x, int y) {
 void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
     printf("Path: ");
     for (int i = 0; i < pathLength; i++) {
-        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);  // Memperbaiki urutan x dan y
+        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);
         if (i < pathLength - 1) printf(" -> ");
     }
     printf("\n");
 
-    // Update shortest path
+    // Update shortest and longest path
     if (*shortestLength == 0 || pathLength < *shortestLength) {
         *shortestLength = pathLength;
         memcpy(*shortestPath, path, pathLength * 2 * sizeof(int));
     }
-
-    // Update longest path
     if (pathLength > *longestLength) {
         *longestLength = pathLength;
         memcpy(*longestPath, path, pathLength * 2 * sizeof(int));
     }
 }
-
 
 // DFS untuk mencari semua jalur yang mungkin
 void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
@@ -47,7 +45,7 @@ void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **s
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     } else {
-        // Explore kanan, kiri, bawah, atas
+        // Explore all four directions
         if (isValid(x + 1, y)) DFS(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x - 1, y)) DFS(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
         if (isValid(x, y + 1)) DFS(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
@@ -84,7 +82,7 @@ int main() {
 
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
-    // Mencari titik S dan E
+    // Find start and end points
     for (int y = 0; y < nRows; y++) {
         for (int x = 0; x < nCols; x++) {
             if (maze[y][x] == 'S') {
@@ -107,7 +105,12 @@ int main() {
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;
 
+    clock_t start_time = clock();
     DFS(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
+    clock_t end_time = clock();
+    double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+    printf("Time spent: %f seconds\n", time_spent);
 
     printf("Shortest Path: ");
     for (int i = 0; i < shortestLength; i++) {

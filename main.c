@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_SIZE 100
 
@@ -22,7 +23,7 @@ int main() {
 
     int startX = -1, startY = -1, endX = -1, endY = -1;
 
-    // Mencari titik S dan E
+    // Find start and end points
     for (int y = 0; y < nRows; y++) {
         for (int x = 0; x < nCols; x++) {
             if (maze[y][x] == 'S') {
@@ -45,7 +46,12 @@ int main() {
     int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
     int shortestLength = 0, longestLength = 0;
 
+    clock_t start_time = clock();
     DFS(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
+    clock_t end_time = clock();
+    double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+    printf("Time spent: %f seconds\n", time_spent);
 
     printf("Shortest Path: ");
     for (int i = 0; i < shortestLength; i++) {

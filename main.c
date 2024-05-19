@@ -6,6 +6,9 @@
 #include "solveMaze.h"
 #include "DFS.c"
 #include "backTracking.c"
+#include "isValid.c"
+#include "printPath.c"
+#include "readMaze.c"
 
 int main() {
     char filename[100];

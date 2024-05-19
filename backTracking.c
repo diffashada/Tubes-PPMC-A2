@@ -1,13 +1,13 @@
 #include "solveMaze.h"
 
-
 void solveMazeBacktracking(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    visited[x][y] = true;
+    visited[y][x] = true;
     path[pathIndex][0] = x;
     path[pathIndex][1] = y;
     pathIndex++;
 
     if (x == endX && y == endY) {
+        totalPaths++;
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     } else {
         // Explore down, up, right, left
@@ -17,6 +17,6 @@ void solveMazeBacktracking(int x, int y, int endX, int endY, int path[][2], int 
         if (isValid(x, y - 1)) solveMazeBacktracking(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
     }
 
-    visited[x][y] = false;
+    visited[y][x] = false;
     pathIndex--;
 }

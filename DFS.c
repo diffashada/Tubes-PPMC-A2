@@ -1,7 +1,4 @@
 #include "solveMaze.h"
-#include "isValid.c"
-#include "printPath.c"
-#include "readMaze.c"
 
 // DFS untuk mencari semua jalur yang mungkin
 void DFS(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {

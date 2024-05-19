@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+
 #define MAX_SIZE 100
 
 char maze[MAX_SIZE][MAX_SIZE];

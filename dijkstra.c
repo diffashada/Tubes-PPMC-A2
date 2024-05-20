@@ -42,6 +42,7 @@ void printPath(Point parent[MAX][MAX], Point dest) {
             printf("(%d,%d) -> ", (path[i].x + 1), (path[i].y + 1));
         }
     }
+    printf("\n");
 }
 
 void dijkstra(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
@@ -108,7 +109,7 @@ void dijkstra(char maze[MAX][MAX], int numRows, int numCols, Point src, Point de
     }
 }
 
-void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], Point path[], int pathLen, int *maxPathLen, Point longestPath[]) {
+void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], Point path[], int pathLen, int *maxPathLen, Point longestPath[], int* pathCount) {
     if (src.x == dest.x && src.y == dest.y) {
         if (pathLen > *maxPathLen) {
             *maxPathLen = pathLen;
@@ -116,60 +117,6 @@ void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, i
                 longestPath[i] = path[i];
             }
         }
-        return;
-    }
-
-    int rowNum[] = {-1, 1, 0, 0};
-    int colNum[] = {0, 0, -1, 1};
-
-    for (int i = 0; i < 4; i++) {
-        int newRow = src.x + rowNum[i];
-        int newCol = src.y + colNum[i];
-
-        if (isValid(newRow, newCol, numRows, numCols) && (maze[newRow][newCol] == '.' || maze[newRow][newCol] == 'E') && !visited[newRow][newCol]) {
-            visited[newRow][newCol] = 1;
-            path[pathLen] = (Point){newRow, newCol};
-            dfs(maze, numRows, numCols, (Point){newRow, newCol}, dest, visited, path, pathLen + 1, maxPathLen, longestPath);
-            visited[newRow][newCol] = 0;
-        }
-    }
-}
-
-void findLongestPath(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
-    int visited[MAX][MAX] = {0};
-    Point longestPath[MAX * MAX];
-    Point path[MAX * MAX];
-    int maxPathLen = 0;
-
-    visited[src.x][src.y] = 1;
-    path[0] = src;
-
-    dfs(maze, numRows, numCols, src, dest, visited, path, 1, &maxPathLen, longestPath);
-
-    if (maxPathLen == 0) {
-        printf("No longest path found\n");
-    }
-    else {
-        printf("\n");
-        printf("\n");
-        printf("Longest Path: ");
-        for (int i = 0; i < maxPathLen; i++) {
-            if (i + 1 == maxPathLen) {
-                printf("(%d,%d)", (longestPath[i].x + 1), (longestPath[i].y + 1));
-            }
-            else {
-                printf("(%d,%d) -> ", (longestPath[i].x + 1), (longestPath[i].y + 1));
-            }
-        }
-        printf("\n");
-    }
-}
-
-void countAllPaths(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], int* pathCount, Point path[], int pathLen) {
-    path[pathLen] = src;
-    pathLen++;
-
-    if (src.x == dest.x && src.y == dest.y) {
         (*pathCount)++;
         printf("Path-%d: ", *pathCount);
         for (int i = 0; i < pathLen; i++) {
@@ -185,18 +132,49 @@ void countAllPaths(char maze[MAX][MAX], int numRows, int numCols, Point src, Poi
     int rowNum[] = {-1, 1, 0, 0};
     int colNum[] = {0, 0, -1, 1};
 
-    visited[src.x][src.y] = 1;
-
     for (int i = 0; i < 4; i++) {
         int newRow = src.x + rowNum[i];
         int newCol = src.y + colNum[i];
 
+        
         if (isValid(newRow, newCol, numRows, numCols) && (maze[newRow][newCol] == '.' || maze[newRow][newCol] == 'E') && !visited[newRow][newCol]) {
-            countAllPaths(maze, numRows, numCols, (Point){newRow, newCol}, dest, visited, pathCount, path, pathLen);
+            visited[newRow][newCol] = 1;
+            path[pathLen] = (Point){newRow, newCol};
+            dfs(maze, numRows, numCols, (Point){newRow, newCol}, dest, visited, path, pathLen + 1, maxPathLen, longestPath, pathCount);
+            visited[newRow][newCol] = 0;
         }
     }
+}
 
-    visited[src.x][src.y] = 0;
+void findLongestPath(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
+    int visited[MAX][MAX] = {0};
+    Point longestPath[MAX * MAX];
+    Point path[MAX * MAX];
+    int maxPathLen = 0;
+    int pathCount = 0;
+
+    visited[src.x][src.y] = 1;
+    path[0] = src;
+
+    dfs(maze, numRows, numCols, src, dest, visited, path, 1, &maxPathLen, longestPath, &pathCount);
+
+    if (maxPathLen == 0) {
+        printf("\nNo longest path found\n");
+    }
+    else {
+        printf("\nTotal number of possible paths: %d\n", pathCount);
+        printf("\n");
+        printf("Longest Path: ");
+        for (int i = 0; i < maxPathLen; i++) {
+            if (i + 1 == maxPathLen) {
+                printf("(%d,%d)", (longestPath[i].x + 1), (longestPath[i].y + 1));
+            }
+            else {
+                printf("(%d,%d) -> ", (longestPath[i].x + 1), (longestPath[i].y + 1));
+            }
+        }
+        printf("\n");
+    }
 }
 
 // Baca input file
@@ -240,16 +218,9 @@ int main() {
         }
     }
 
-    int visited[MAX][MAX] = {0};
-    Point path[MAX * MAX];
-    int pathCount = 0;
-    countAllPaths(maze, nRows, nCols, src, dest, visited, &pathCount, path,0);
-
-    dijkstra(maze, nRows, nCols, src, dest);
-
     findLongestPath(maze, nRows, nCols, src, dest);
 
-    printf("\nTotal number of possible paths: %d\n", pathCount);
+    dijkstra(maze, nRows, nCols, src, dest);
 
     return 0;
 }

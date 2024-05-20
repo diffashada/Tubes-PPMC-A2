@@ -27,6 +27,7 @@ int isDestination(int row, int col, Point dest) {
     return row == dest.x && col == dest.y;
 }
 
+// Fungsi untuk print shortest path
 void printPath(Point parent[MAX][MAX], Point dest) {
     Point path[MAX * MAX];
     int pathLen = 0;
@@ -46,6 +47,7 @@ void printPath(Point parent[MAX][MAX], Point dest) {
     printf("\n");
 }
 
+// Algoritma Dijkstra untuk mencari shortest path
 void dijkstra(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
     int dist[MAX][MAX];
     int visited[MAX][MAX];
@@ -110,6 +112,7 @@ void dijkstra(char maze[MAX][MAX], int numRows, int numCols, Point src, Point de
     }
 }
 
+// Algoritma DFS untuk mencari longest path dan total possible path
 void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], Point path[], int pathLen, int *maxPathLen, Point longestPath[], int* pathCount) {
     if (src.x == dest.x && src.y == dest.y) {
         if (pathLen > *maxPathLen) {
@@ -147,6 +150,7 @@ void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, i
     }
 }
 
+// Mencari longest path dengan DFS
 void findLongestPath(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
     int visited[MAX][MAX] = {0};
     Point longestPath[MAX * MAX];
@@ -218,17 +222,23 @@ int main() {
         }
     }
 
-    double time_spent;
-    clock_t start_time = clock();
+    double time_spent_dfs;
+    double time_spent_dijkstra;
 
-    findLongestPath(maze, nRows, nCols, src, dest);
+    clock_t start_time_dfs = clock();
+    findLongestPath(maze, nRows, nCols, src, dest); // Algoritma DFS
+    clock_t end_time_dfs = clock();
+    time_spent_dfs = (double)(end_time_dfs - start_time_dfs) / CLOCKS_PER_SEC;
 
-    dijkstra(maze, nRows, nCols, src, dest);
+    clock_t start_time_dijkstra = clock();
+    dijkstra(maze, nRows, nCols, src, dest); // Algoritma Dijkstra
+    clock_t end_time_dijkstra = clock();
+    time_spent_dijkstra = (double)(end_time_dijkstra - start_time_dijkstra) / CLOCKS_PER_SEC;
 
-    clock_t end_time = clock();
-    time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-    printf("\nTime spent: %f seconds\n", time_spent);
+    printf("\nTime spent in DFS: %f seconds\n", time_spent_dfs);
+    printf("Time spent in Dijkstra: %f seconds\n", time_spent_dijkstra);
+    printf("Total Time spent: %f seconds\n", time_spent_dfs + time_spent_dijkstra);
 
     return 0;
 }

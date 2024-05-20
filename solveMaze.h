@@ -14,6 +14,8 @@ bool visited[MAX_SIZE][MAX_SIZE];
 int nRows, nCols;
 int totalPaths = 0;  // Variabel untuk menyimpan jumlah total jalur yang valid
 
+int x, y;
+
 typedef struct {
     int x, y;
 } Point;

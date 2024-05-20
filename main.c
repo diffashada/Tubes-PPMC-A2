@@ -9,6 +9,7 @@
 #include "isValid.c"
 #include "printPath.c"
 #include "readMaze.c"
+#include "greedy.c"
 
 int main() {
     char filename[100];
@@ -17,7 +18,7 @@ int main() {
     scanf("%s", filename);
     readMaze(filename);
 
-    printf("What algorithm methods do you want to use? (dfs/backtracking)\n");
+    printf("What algorithm methods do you want to use? (dfs/backtracking/greedy)\n");
     printf("Algorithm : ");
     scanf("%s", algo);
 
@@ -57,7 +58,10 @@ int main() {
     else if (strcmp(algo, "backtracking") == 0){
         solveMazeBacktracking(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
     }
-    
+
+    else if (strcmp(algo, "greedy") == 0){
+        greedyAlg(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
+    }
     clock_t end_time = clock();
     time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 

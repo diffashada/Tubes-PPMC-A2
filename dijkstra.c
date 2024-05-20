@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX 100
 #define INF INT_MAX
@@ -195,7 +196,6 @@ void readMaze(const char* filename) {
     fclose(file);
 }
 
-
 int main() {
     char filename[100];
     printf("Enter the maze file name: ");
@@ -218,9 +218,17 @@ int main() {
         }
     }
 
+    double time_spent;
+    clock_t start_time = clock();
+
     findLongestPath(maze, nRows, nCols, src, dest);
 
     dijkstra(maze, nRows, nCols, src, dest);
+
+    clock_t end_time = clock();
+    time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+    printf("\nTime spent: %f seconds\n", time_spent);
 
     return 0;
 }

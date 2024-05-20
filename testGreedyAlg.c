@@ -1,178 +1,55 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <time.h>
+#include "solveMaze.h"
 
-#define MAX_SIZE 100
-
-char maze[MAX_SIZE][MAX_SIZE];
-bool visited[MAX_SIZE][MAX_SIZE];
-int nRows, nCols;
-
-void readMaze(const char* filename) {
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        perror("Unable to open file");
-        exit(EXIT_FAILURE);
-    }
-
-    nRows = 0;
-    while (fgets(maze[nRows], MAX_SIZE, file)) {
-        nCols = strlen(maze[nRows]) - 1; 
-        maze[nRows][nCols] = '\0';  
-        nRows++;
-    }
-
-    fclose(file);
-}
-
-void printPath(int path[][2], int pathLength, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    printf("Path: ");
-    for (int i = 0; i < pathLength; i++) {
-        printf("(%d,%d)", path[i][0] + 1, path[i][1] + 1);  // Memperbaiki urutan x dan y
-        if (i < pathLength - 1) printf(" -> ");
-    }
-    printf("\n");
-
-    // Update shortest path
-    if (*shortestLength == 0 || pathLength < *shortestLength) {
-        *shortestLength = pathLength;
-        memcpy(*shortestPath, path, pathLength * 2 * sizeof(int));
-    }
-
-    // Update longest path
-    if (pathLength > *longestLength) {
-        *longestLength = pathLength;
-        memcpy(*longestPath, path, pathLength * 2 * sizeof(int));
-    }
-}
-
-bool isValid(int x, int y) {
-    return y >= 0 && y < nRows && x >= 0 && x < nCols && maze[y][x] != '#' && !visited[y][x];
-}
 
 void greedyAlg(int x, int y, int endX, int endY, int path[][2], int pathIndex, int **shortestPath, int **longestPath, int *shortestLength, int *longestLength) {
-    visited[y][x] = true;
+    if (!isValid(x, y) || visited[y][x]) return; // Return if position is not valid or already visited.
+
+    visited[y][x] = true; // Mark current position as visited.
     path[pathIndex][0] = x;
     path[pathIndex][1] = y;
     pathIndex++;
 
-    int distanceX, distanceY = 0;
-    distanceX = endX - x;
-    distanceY = endY - y;
-
     if (x == endX && y == endY) {
         printPath(path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    }
-    else{
-        if (abs(distanceX) > abs(distanceY)){
-            if (distanceY == 0){
-                if (distanceX > 0){
-                    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);    
-                }
-                else{
-                    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-                }
-            
-            }
-            else{
-                if (distanceY > 0){
-                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-                }
-                else{
-                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-                }
-            }
-        }
-        if (abs(distanceX) < abs(distanceY)){
-            if (distanceX == 0){
-                if (distanceY > 0){
-                    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-                }
-                else{
-                    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-                }
-            }
-            else if (distanceX > 0){
-                if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);                
-            }
-            else{
-                if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-            }
-        }
-    }
-    
-    xMove:
-    if (isValid(x + 1, y)) greedyAlg(x + 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    xMoveNeg:
-    if (isValid(x - 1, y)) greedyAlg(x - 1, y, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    yMove:
-    if (isValid(x, y + 1)) greedyAlg(x, y + 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
-    yMoveNeg:
-    if (isValid(x, y - 1)) greedyAlg(x, y - 1, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+        totalPaths++; // Increment total path count on reaching the end.
+    } else {
+        int direction[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; // Directions: right, down, left, up
+        int distance[4]; // Overall distances for each direction towards the end.
 
-    end:
+        // Calculate scores for each direction
+        for (int i = 0; i < 4; i++) {
+            int newX = x + direction[i][0];
+            int newY = y + direction[i][1];
+            distance[i] = abs(endX - newX) + abs(endY - newY); // Overall/Manhattan distance to end coords
+        }
+
+        // Sort directions based on overall distance using bubble sort
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3 - i; j++) {
+                if (distance[j] > distance[j + 1]) {
+                    // Swap distances
+                    int temp = distance[j];
+                    distance[j] = distance[j + 1];
+                    distance[j + 1] = temp;
+                    // Swap diections
+                    int tempDir[2] = {direction[j][0], direction[j][1]};
+                    direction[j][0] = direction[j + 1][0];
+                    direction[j][1] = direction[j + 1][1];
+                    direction[j + 1][0] = tempDir[0];
+                    direction[j + 1][1] = tempDir[1];
+                }
+            }
+        }
+
+        // Explore based on sorted overall distance
+        for (int i = 0; i < 4; i++) {
+            int newX = x + direction[i][0];
+            int newY = y + direction[i][1];
+            greedyAlg(newX, newY, endX, endY, path, pathIndex, shortestPath, longestPath, shortestLength, longestLength);
+        }
+    }
+
+    // Backtracking
     visited[y][x] = false;
     pathIndex--;
-    
-
-}
-
-int main() {
-    char filename[100];
-    printf("Enter the maze file name: ");
-    scanf("%s", filename);
-    readMaze(filename);
-
-    int startX = -1, startY = -1, endX = -1, endY = -1;
-
-    // Find start and end points
-    for (int y = 0; y < nRows; y++) {
-        for (int x = 0; x < nCols; x++) {
-            if (maze[y][x] == 'S') {
-                startX = x;
-                startY = y;
-            } else if (maze[y][x] == 'E') {
-                endX = x;
-                endY = y;
-            }
-        }
-    }
-
-    if (startX == -1 || startY == -1 || endX == -1 || endY == -1) {
-        printf("Start or end not found in the maze.\n");
-        return 1;
-    }
-
-    int path[MAX_SIZE * MAX_SIZE][2];
-    int *shortestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
-    int *longestPath = malloc(MAX_SIZE * MAX_SIZE * 2 * sizeof(int));
-    int shortestLength = 0, longestLength = 0;
-
-    clock_t start_time = clock();
-    greedyAlg(startX, startY, endX, endY, path, 0, &shortestPath, &longestPath, &shortestLength, &longestLength);
-    clock_t end_time = clock();
-    double time_spent = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-
-    printf("Time spent: %f seconds\n", time_spent);
-
-    printf("Shortest Path: ");
-    for (int i = 0; i < shortestLength; i++) {
-        printf("(%d,%d)", shortestPath[i*2] + 1, shortestPath[i*2 + 1] + 1);
-        if (i < shortestLength - 1) printf(" -> ");
-    }
-    printf("\n");
-
-    printf("Longest Path: ");
-    for (int i = 0; i < longestLength; i++) {
-        printf("(%d,%d)", longestPath[i*2] + 1, longestPath[i*2 + 1] + 1);
-        if (i < longestLength - 1) printf(" -> ");
-    }
-    printf("\n");
-
-    free(shortestPath);
-    free(longestPath);
-
-    return 0;
 }

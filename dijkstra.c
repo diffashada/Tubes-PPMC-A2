@@ -36,10 +36,10 @@ void printPath(Point parent[MAX][MAX], Point dest) {
     printf("Shortest Path: ");
     for (int i = pathLen - 1; i >= 0; i--) {
         if (i == 0) {
-            printf("(%d, %d)", (path[i].x + 1), (path[i].y + 1));
+            printf("(%d,%d)", (path[i].x + 1), (path[i].y + 1));
         }
         else {
-            printf("(%d, %d) -> ", (path[i].x + 1), (path[i].y + 1));
+            printf("(%d,%d) -> ", (path[i].x + 1), (path[i].y + 1));
         }
     }
 }
@@ -137,8 +137,8 @@ void dfs(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, i
 
 void findLongestPath(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest) {
     int visited[MAX][MAX] = {0};
-    Point path[MAX * MAX];
     Point longestPath[MAX * MAX];
+    Point path[MAX * MAX];
     int maxPathLen = 0;
 
     visited[src.x][src.y] = 1;
@@ -155,19 +155,30 @@ void findLongestPath(char maze[MAX][MAX], int numRows, int numCols, Point src, P
         printf("Longest Path: ");
         for (int i = 0; i < maxPathLen; i++) {
             if (i + 1 == maxPathLen) {
-                printf("(%d, %d)", (longestPath[i].x + 1), (longestPath[i].y + 1));
+                printf("(%d,%d)", (longestPath[i].x + 1), (longestPath[i].y + 1));
             }
             else {
-                printf("(%d, %d) -> ", (longestPath[i].x + 1), (longestPath[i].y + 1));
+                printf("(%d,%d) -> ", (longestPath[i].x + 1), (longestPath[i].y + 1));
             }
         }
         printf("\n");
     }
 }
 
-void countAllPaths(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], int* pathCount) {
+void countAllPaths(char maze[MAX][MAX], int numRows, int numCols, Point src, Point dest, int visited[MAX][MAX], int* pathCount, Point path[], int pathLen) {
+    path[pathLen] = src;
+    pathLen++;
+
     if (src.x == dest.x && src.y == dest.y) {
         (*pathCount)++;
+        printf("Path-%d: ", *pathCount);
+        for (int i = 0; i < pathLen; i++) {
+            printf("(%d,%d)", (path[i].x + 1), (path[i].y + 1));
+            if (i < pathLen - 1) {
+                printf(" -> ");
+            }
+        }
+        printf("\n");
         return;
     }
 
@@ -181,7 +192,7 @@ void countAllPaths(char maze[MAX][MAX], int numRows, int numCols, Point src, Poi
         int newCol = src.y + colNum[i];
 
         if (isValid(newRow, newCol, numRows, numCols) && (maze[newRow][newCol] == '.' || maze[newRow][newCol] == 'E') && !visited[newRow][newCol]) {
-            countAllPaths(maze, numRows, numCols, (Point){newRow, newCol}, dest, visited, pathCount);
+            countAllPaths(maze, numRows, numCols, (Point){newRow, newCol}, dest, visited, pathCount, path, pathLen);
         }
     }
 
@@ -229,14 +240,15 @@ int main() {
         }
     }
 
+    int visited[MAX][MAX] = {0};
+    Point path[MAX * MAX];
+    int pathCount = 0;
+    countAllPaths(maze, nRows, nCols, src, dest, visited, &pathCount, path,0);
+
     dijkstra(maze, nRows, nCols, src, dest);
 
     findLongestPath(maze, nRows, nCols, src, dest);
 
-    int visited[MAX][MAX] = {0};
-    int pathCount = 0;
-
-    countAllPaths(maze, nRows, nCols, src, dest, visited, &pathCount);
     printf("\nTotal number of possible paths: %d\n", pathCount);
 
     return 0;
